@@ -23,7 +23,7 @@ Plugin 'vim-syntastic/syntastic'
 Plugin 'nvie/vim-flake8'
 
 " Colors
-"Plugin 'jnurmine/Zenburn'
+Plugin 'jnurmine/Zenburn'
 Plugin 'ayu-theme/ayu-vim'
 
 " Python3 VirtualEnv support
@@ -91,6 +91,13 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+"define BadWhitespace before using in a match
+highlight BadWhitespace ctermbg=darkgreen guibg=darkgreen
+autocmd ColorScheme * highlight BadWhitespace ctermbg=darkgreen guibg=darkgreen
+
+"Find whitespace that could cause issues
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h,*php,*.inc.php match BadWhitespace /\s\+$/
+
 " General file spacing
 set tabstop=2
 set softtabstop=2
@@ -133,6 +140,7 @@ au BufNewFile,BufRead *.php
     \ set autoindent |
     \ set fileformat=unix |
     \ set encoding=utf-8 |
+    \ set colorcolumn=80 |
     \ syntax on |
 
 " vim settings for js, html and css files
@@ -152,6 +160,14 @@ map <Space> <leader>
 " Goto definition
 map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
+"highlight ExtraWhitespace ctermbg=red guibg=red
+"match ExtraWhitespace /\s\+$/
+"autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+"autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+"autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+"autocmd BufWinLeave * call clearmatches()
+"au BufRead,BufNewFile *py,*pyw,*.c,*.h match ExtraWhitespace /\s\+$/
+
 set t_Co=256
 if has('gui_running')
   set background=dark
@@ -162,20 +178,17 @@ else
   colorscheme ayu
 endif
 
-"define BadWhitespace before using in a match
-highlight BadWhitespace ctermbg=darkred guibg=darkred
-autocmd ColorScheme * highlight BadWhitespace ctermbg=darkred guibg=darkred
-
-" Find whitespace that could cause issues
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
-
 if &term =~ '256color'
   " disable Background Color Erase (BCE) so that color schemes
   " render properly when inside 256-color GNU screen.
   set t_ut=
 endif
 
-let &t_ut=''
+if &term =~ 'kitty'
+  "let &t_ut=''
+  set t_ut=
+endif
+
 
 " Ctrl+n to toggle NERDTree
 map <C-n> :NERDTreeToggle<CR>
